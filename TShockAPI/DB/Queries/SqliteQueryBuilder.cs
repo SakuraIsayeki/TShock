@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using MySql.Data.MySqlClient;
+using ZLinq;
 
 namespace TShockAPI.DB.Queries;
 
@@ -36,19 +36,20 @@ public class SqliteQueryBuilder : GenericQueryBuilder, IQueryBuilder
 	public override string CreateTable(SqlTable table)
 	{
 		ValidateSqlColumnType(table.Columns);
-		var columns =
-			table.Columns.Select(
-				c =>
-					"'{0}' {1} {2} {3} {4} {5}".SFormat(c.Name,
-						DbTypeToString(c.Type, c.Length),
-						c.Primary ? "PRIMARY KEY" : "",
-						c.AutoIncrement ? "AUTOINCREMENT" : "",
-						c.NotNull ? "NOT NULL" : "",
-						c.DefaultCurrentTimestamp ? "DEFAULT CURRENT_TIMESTAMP" : ""));
+		var columns = table.Columns.Select(c =>
+			"'{0}' {1} {2} {3} {4} {5}".SFormat(c.Name,
+				DbTypeToString(c.Type, c.Length),
+				c.Primary ? "PRIMARY KEY" : "",
+				c.AutoIncrement ? "AUTOINCREMENT" : "",
+				c.NotNull ? "NOT NULL" : "",
+				c.DefaultCurrentTimestamp ? "DEFAULT CURRENT_TIMESTAMP" : "")
+			);
+
 		var uniques = table.Columns.Where(c => c.Unique).Select(c => c.Name);
+
 		return "CREATE TABLE {0} ({1} {2})".SFormat(EscapeTableName(table.Name),
-			string.Join(", ", columns),
-			uniques.Count() > 0 ? ", UNIQUE({0})".SFormat(string.Join(", ", uniques)) : "");
+			columns.JoinToString(", "),
+			uniques.Any() ? ", UNIQUE({0})".SFormat(uniques.JoinToString(", ")) : "");
 	}
 
 	/// <summary>
@@ -91,7 +92,7 @@ public class SqliteQueryBuilder : GenericQueryBuilder, IQueryBuilder
 			return ret;
 		}
 
-		throw new NotImplementedException(Enum.GetName(typeof(MySqlDbType), type));
+		throw new NotImplementedException(Enum.GetName(type));
 	}
 
 	/// <summary>

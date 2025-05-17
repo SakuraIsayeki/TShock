@@ -1,4 +1,4 @@
-/*
+﻿/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -97,7 +97,10 @@ namespace TShockAPI.DB
 			try
 			{
 				// Logout any player logged in as the account to be removed
-				TShock.Players.Where(p => p?.IsLoggedIn == true && p.Account.Name == account.Name).ForEach(p => p.Logout());
+				foreach (var player in TShock.Players.Where(p => p?.IsLoggedIn == true && p.Account.Name == account.Name))
+				{
+					player.Logout();
+				}
 
 				UserAccount tempuser = GetUserAccount(account);
 				int affected = _database.Query("DELETE FROM Users WHERE Username=@0", account.Name);

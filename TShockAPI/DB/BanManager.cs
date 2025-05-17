@@ -1,4 +1,4 @@
-/*
+﻿/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -411,7 +411,7 @@ namespace TShockAPI.DB
 		public IEnumerable<Ban> GetBansByIdentifiers(bool currentOnly = true, params string[] identifiers)
 		{
 			//Generate a sequence of '@0, @1, @2, ... etc'
-			var parameters = string.Join(", ", Enumerable.Range(0, identifiers.Length).Select(p => $"@{p}"));
+			var parameters = string.Join(", ", [..Enumerable.Range(0, identifiers.Length).Select(p => $"@{p}")]);
 
 			string query = $"SELECT * FROM PlayerBans WHERE Identifier IN ({parameters})";
 

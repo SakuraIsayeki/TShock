@@ -1,4 +1,4 @@
-/*
+﻿/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -1269,7 +1270,7 @@ namespace TShockAPI
 			if (players.Count < 1)
 				args.Player.SendErrorMessage(GetString("Invalid player."));
 			else if (players.Count > 1)
-				args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			else
 			{
 				args.Player.SendSuccessMessage(GetString($"IP Address: {players[0].IP}."));
@@ -1340,7 +1341,7 @@ namespace TShockAPI
 			}
 			else if (players.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			}
 			else
 			{
@@ -1587,7 +1588,7 @@ namespace TShockAPI
 
 				if (players.Count > 1)
 				{
-					args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+					args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 					return;
 				}
 
@@ -1803,7 +1804,7 @@ namespace TShockAPI
 			}
 			else if (matchedPlayers.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(matchedPlayers.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..matchedPlayers.Select(p => p.Name)]);
 				return;
 			}
 
@@ -1836,7 +1837,7 @@ namespace TShockAPI
 				List<TSPlayer> players = TSPlayer.FindByNameOrID(args.Parameters[0]);
 				if (players.Count > 1)
 				{
-					args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+					args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 					return;
 				}
 				else if (players.Count == 0)
@@ -1941,7 +1942,7 @@ namespace TShockAPI
 
 			if (ply.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(ply.Select(p => p.Account.Name));
+				args.Player.SendMultipleMatchError([..ply.Select(p => p.Account.Name)]);
 			}
 
 			if (!TShock.Groups.GroupExists(args.Parameters[1]))
@@ -2018,11 +2019,10 @@ namespace TShockAPI
 				return;
 			}
 
-			string replacementCommand = String.Join(" ", args.Parameters.Select(p => p.Contains(" ") ? $"\"{p}\"" : p));
+			string replacementCommand = args.Parameters.Select(p => p.Contains(' ') ? $"\"{p}\"" : p).JoinToString(' ');
 			args.Player.tempGroup = new SuperAdminGroup();
 			HandleCommand(args.Player, replacementCommand);
 			args.Player.tempGroup = null;
-			return;
 		}
 
 		private static void Broadcast(CommandArgs args)
@@ -2094,23 +2094,18 @@ namespace TShockAPI
 						Dictionary<string, int> restUsersTokens = new Dictionary<string, int>();
 						foreach (Rests.SecureRest.TokenData tokenData in TShock.RestApi.Tokens.Values)
 						{
-							if (restUsersTokens.ContainsKey(tokenData.Username))
+							if (!restUsersTokens.TryAdd(tokenData.Username, 1))
 								restUsersTokens[tokenData.Username]++;
-							else
-								restUsersTokens.Add(tokenData.Username, 1);
 						}
 
-						List<string> restUsers = new List<string>(
-							restUsersTokens.Select(ut => GetString("{0} ({1} tokens)", ut.Key, ut.Value)));
+						List<string> restUsers = restUsersTokens.Select(ut => GetString("{0} ({1} tokens)", ut.Key, ut.Value)).ToList();
 
-						PaginationTools.SendPage(
-							args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(restUsers), new PaginationTools.Settings
-							{
-								NothingToDisplayString = GetString("There are currently no active REST users."),
-								HeaderFormat = GetString("Active REST Users ({{0}}/{{1}}):"),
-								FooterFormat = GetString("Type {0}rest listusers {{0}} for more.", Specifier)
-							}
-						);
+						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(restUsers), new()
+						{
+							NothingToDisplayString = GetString("There are currently no active REST users."),
+							HeaderFormat = GetString("Active REST Users ({{0}}/{{1}}):"),
+							FooterFormat = GetString("Type {0}rest listusers {{0}} for more.", Specifier)
+						});
 
 						break;
 					}
@@ -2877,7 +2872,7 @@ namespace TShockAPI
 			}
 			else if (npcs.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(npcs.Select(n => $"{n.FullName}({n.type})"));
+				args.Player.SendMultipleMatchError([..npcs.Select(n => $"{n.FullName}({n.type})")]);
 			}
 			else
 			{
@@ -2956,7 +2951,7 @@ namespace TShockAPI
 				if (players.Count == 0)
 					args.Player.SendErrorMessage(GetString("Invalid destination player."));
 				else if (players.Count > 1)
-					args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+					args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 				else
 				{
 					var target = players[0];
@@ -2987,7 +2982,7 @@ namespace TShockAPI
 				if (players2.Count == 0)
 					args.Player.SendErrorMessage(GetString("Invalid destination player."));
 				else if (players2.Count > 1)
-					args.Player.SendMultipleMatchError(players2.Select(p => p.Name));
+					args.Player.SendMultipleMatchError([..players2.Select(p => p.Name)]);
 				else if (players1.Count == 0)
 				{
 					if (args.Parameters[0] == "*")
@@ -3027,7 +3022,7 @@ namespace TShockAPI
 						args.Player.SendErrorMessage(GetString("Invalid destination player."));
 				}
 				else if (players1.Count > 1)
-					args.Player.SendMultipleMatchError(players1.Select(p => p.Name));
+					args.Player.SendMultipleMatchError([..players1.Select(p => p.Name)]);
 				else
 				{
 					var source = players1[0];
@@ -3100,7 +3095,7 @@ namespace TShockAPI
 					args.Player.SendErrorMessage(GetString("Invalid destination player."));
 			}
 			else if (players.Count > 1)
-				args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			else
 			{
 				var plr = players[0];
@@ -3139,7 +3134,7 @@ namespace TShockAPI
 
 			if (matches.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(matches.Select(n => $"{n.FullName}({n.whoAmI})"));
+				args.Player.SendMultipleMatchError([..matches.Select(n => $"{n.FullName}({n.whoAmI})")]);
 				return;
 			}
 			if (matches.Count == 0)
@@ -3168,7 +3163,7 @@ namespace TShockAPI
 			}
 			else if (players.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			}
 			else
 			{
@@ -3232,12 +3227,14 @@ namespace TShockAPI
 			if (args.Parameters[0].Equals("list"))
 			{
 				#region List warps
-				int pageNumber;
-				if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out pageNumber))
+
+				if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out int pageNumber))
 					return;
-				IEnumerable<string> warpNames = from warp in TShock.Warps.Warps
-												where !warp.IsPrivate
-												select warp.Name;
+
+				var warpNames = TShock.Warps.Warps
+					.Where(warp => !warp.IsPrivate)
+					.Select(warp => warp.Name)
+					.ToArray();
 				PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(warpNames),
 					new PaginationTools.Settings
 					{
@@ -3245,9 +3242,10 @@ namespace TShockAPI
 						FooterFormat = GetString("Type {0}warp list {{0}} for more.", Specifier),
 						NothingToDisplayString = GetString("There are currently no warps defined.")
 					});
+
 				#endregion
 			}
-			else if (args.Parameters[0].ToLower() == "add" && hasManageWarpPermission)
+			else if (args.Parameters[0].Equals("add", StringComparison.OrdinalIgnoreCase) && hasManageWarpPermission)
 			{
 				#region Add warp
 				if (args.Parameters.Count == 2)
@@ -3270,7 +3268,7 @@ namespace TShockAPI
 					args.Player.SendErrorMessage(GetString("Invalid syntax. Proper syntax: {0}warp add [name].", Specifier));
 				#endregion
 			}
-			else if (args.Parameters[0].ToLower() == "del" && hasManageWarpPermission)
+			else if (args.Parameters[0].Equals("del", StringComparison.OrdinalIgnoreCase) && hasManageWarpPermission)
 			{
 				#region Del warp
 				if (args.Parameters.Count == 2)
@@ -3287,7 +3285,7 @@ namespace TShockAPI
 					args.Player.SendErrorMessage(GetString("Invalid syntax. Proper syntax: {0}warp del [name].", Specifier));
 				#endregion
 			}
-			else if (args.Parameters[0].ToLower() == "hide" && hasManageWarpPermission)
+			else if (args.Parameters[0].Equals("hide", StringComparison.OrdinalIgnoreCase) && hasManageWarpPermission)
 			{
 				#region Hide warp
 				if (args.Parameters.Count == 3)
@@ -3313,7 +3311,7 @@ namespace TShockAPI
 					args.Player.SendErrorMessage(GetString("Invalid syntax. Proper syntax: {0}warp hide [name] <true/false>.", Specifier));
 				#endregion
 			}
-			else if (args.Parameters[0].ToLower() == "send" && args.Player.HasPermission(Permissions.tpothers))
+			else if (args.Parameters[0].Equals("send", StringComparison.OrdinalIgnoreCase) && args.Player.HasPermission(Permissions.tpothers))
 			{
 				#region Warp send
 				if (args.Parameters.Count < 3)
@@ -3323,14 +3321,16 @@ namespace TShockAPI
 				}
 
 				var foundplr = TSPlayer.FindByNameOrID(args.Parameters[1]);
+
 				if (foundplr.Count == 0)
 				{
 					args.Player.SendErrorMessage(GetString("Invalid target player."));
 					return;
 				}
-				else if (foundplr.Count > 1)
+
+				if (foundplr.Count > 1)
 				{
-					args.Player.SendMultipleMatchError(foundplr.Select(p => p.Name));
+					args.Player.SendMultipleMatchError([..foundplr.Select(p => p.Name)]);
 					return;
 				}
 
@@ -3353,8 +3353,9 @@ namespace TShockAPI
 			}
 			else
 			{
-				string warpName = String.Join(" ", args.Parameters);
+				string warpName = string.Join(' ', args.Parameters);
 				var warp = TShock.Warps.Find(warpName);
+
 				if (warp != null)
 				{
 					if (args.Player.Teleport(warp.Position.X * 16, warp.Position.Y * 16))
@@ -3493,7 +3494,7 @@ namespace TShockAPI
 
 						if (args.Parameters.Count > 2)
 						{
-							string newParentGroupName = string.Join(" ", args.Parameters.Skip(2));
+							string newParentGroupName = args.Parameters.Skip(2).JoinToString(' ');
 							if (!string.IsNullOrWhiteSpace(newParentGroupName) && !TShock.Groups.GroupExists(newParentGroupName))
 							{
 								args.Player.SendErrorMessage(GetString("No such group \"{0}\".", newParentGroupName));
@@ -3543,7 +3544,7 @@ namespace TShockAPI
 
 						if (args.Parameters.Count > 2)
 						{
-							string newSuffix = string.Join(" ", args.Parameters.Skip(2));
+							string newSuffix = args.Parameters.Skip(2).JoinToString(' ');
 
 							try
 							{
@@ -3588,7 +3589,7 @@ namespace TShockAPI
 
 						if (args.Parameters.Count > 2)
 						{
-							string newPrefix = string.Join(" ", args.Parameters.Skip(2));
+							string newPrefix = args.Parameters.Skip(2).JoinToString(' ');
 
 							try
 							{
@@ -3750,17 +3751,15 @@ namespace TShockAPI
 				case "list":
 					#region List groups
 					{
-						int pageNumber;
-						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out pageNumber))
-							return;
-						var groupNames = from grp in TShock.Groups.groups
-										 select grp.Name;
-						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(groupNames),
-							new PaginationTools.Settings
-							{
-								HeaderFormat = GetString("Groups ({{0}}/{{1}}):"),
-								FooterFormat = GetString("Type {0}group list {{0}} for more.", Specifier)
-							});
+						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out int pageNumber)) return;
+
+						var groupNames = TShock.Groups.groups.Select(grp => grp.Name).ToArray()
+							;
+						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(groupNames), new()
+						{
+							HeaderFormat = GetString("Groups ({{0}}/{{1}}):"),
+							FooterFormat = GetString("Type {0}group list {{0}} for more.", Specifier)
+						});
 					}
 					#endregion
 					return;
@@ -3824,7 +3823,7 @@ namespace TShockAPI
 						}
 						else if (items.Count > 1)
 						{
-							args.Player.SendMultipleMatchError(items.Select(i => $"{i.Name}({i.netID})"));
+							args.Player.SendMultipleMatchError([..items.Select(i => $"{i.Name}({i.netID})")]);
 						}
 						else
 						{
@@ -3875,7 +3874,7 @@ namespace TShockAPI
 						}
 						else if (items.Count > 1)
 						{
-							args.Player.SendMultipleMatchError(items.Select(i => $"{i.Name}({i.netID})"));
+							args.Player.SendMultipleMatchError([..items.Select(i => $"{i.Name}({i.netID})")]);
 						}
 						else
 						{
@@ -3920,7 +3919,7 @@ namespace TShockAPI
 						}
 						else if (items.Count > 1)
 						{
-							args.Player.SendMultipleMatchError(items.Select(i => $"{i.Name}({i.netID})"));
+							args.Player.SendMultipleMatchError([..items.Select(i => $"{i.Name}({i.netID})")]);
 						}
 						else
 						{
@@ -3946,7 +3945,7 @@ namespace TShockAPI
 						}
 						else if (items.Count > 1)
 						{
-							args.Player.SendMultipleMatchError(items.Select(i => $"{i.Name}({i.netID})"));
+							args.Player.SendMultipleMatchError([..items.Select(i => $"{i.Name}({i.netID})")]);
 						}
 						else
 						{
@@ -4004,18 +4003,15 @@ namespace TShockAPI
 				case "list":
 					#region List items
 					{
-						int pageNumber;
-						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out pageNumber))
-							return;
-						IEnumerable<string> itemNames = from itemBan in TShock.ItemBans.DataModel.ItemBans
-														select itemBan.Name;
-						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(itemNames),
-							new PaginationTools.Settings
-							{
-								HeaderFormat = GetString("Item bans ({{0}}/{{1}}):"),
-								FooterFormat = GetString("Type {0}itemban list {{0}} for more.", Specifier),
-								NothingToDisplayString = GetString("There are currently no banned items.")
-							});
+						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out int pageNumber)) return;
+
+						var itemNames = TShock.ItemBans.DataModel.ItemBans.Select(itemBan => itemBan.Name).ToArray();
+						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(itemNames), new()
+						{
+							HeaderFormat = GetString("Item bans ({{0}}/{{1}}):"),
+							FooterFormat = GetString("Type {0}itemban list {{0}} for more.", Specifier),
+							NothingToDisplayString = GetString("There are currently no banned items.")
+						});
 					}
 					#endregion
 					return;
@@ -4182,18 +4178,15 @@ namespace TShockAPI
 				case "list":
 					#region List projectiles
 					{
-						int pageNumber;
-						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out pageNumber))
-							return;
-						IEnumerable<Int16> projectileIds = from projectileBan in TShock.ProjectileBans.ProjectileBans
-														   select projectileBan.ID;
-						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(projectileIds),
-							new PaginationTools.Settings
-							{
-								HeaderFormat = GetString("Projectile bans ({{0}}/{{1}}):"),
-								FooterFormat = GetString("Type {0}projban list {{0}} for more.", Specifier),
-								NothingToDisplayString = GetString("There are currently no banned projectiles.")
-							});
+						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out int pageNumber)) return;
+
+						var projectileIds = TShock.ProjectileBans.ProjectileBans.Select(projectileBan => projectileBan.ID).ToArray();
+						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(projectileIds), new()
+						{
+							HeaderFormat = GetString("Projectile bans ({{0}}/{{1}}):"),
+							FooterFormat = GetString("Type {0}projban list {{0}} for more.", Specifier),
+							NothingToDisplayString = GetString("There are currently no banned projectiles.")
+						});
 					}
 					#endregion
 					return;
@@ -4358,18 +4351,16 @@ namespace TShockAPI
 				case "list":
 					#region List tile bans
 					{
-						int pageNumber;
-						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out pageNumber))
+						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out int pageNumber))
 							return;
-						IEnumerable<Int16> tileIds = from tileBan in TShock.TileBans.TileBans
-													 select tileBan.ID;
-						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(tileIds),
-							new PaginationTools.Settings
-							{
-								HeaderFormat = GetString("Tile bans ({{0}}/{{1}}):"),
-								FooterFormat = GetString("Type {0}tileban list {{0}} for more.", Specifier),
-								NothingToDisplayString = GetString("There are currently no banned tiles.")
-							});
+
+						var tileIds = TShock.TileBans.TileBans.Select(tileBan => tileBan.ID).ToArray();
+						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(tileIds), new()
+						{
+							HeaderFormat = GetString("Tile bans ({{0}}/{{1}}):"),
+							FooterFormat = GetString("Type {0}tileban list {{0}} for more.", Specifier),
+							NothingToDisplayString = GetString("There are currently no banned tiles.")
+						});
 					}
 					#endregion
 					return;
@@ -4614,7 +4605,7 @@ namespace TShockAPI
 			}
 			else if (players.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			}
 			else
 			{
@@ -4919,25 +4910,25 @@ namespace TShockAPI
 					break;
 				case "list":
 					{
-						int pageNumber;
-						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out pageNumber))
+						if (!PaginationTools.TryParsePageNumber(args.Parameters, 1, args.Player, out int pageNumber))
 							return;
 
-						IEnumerable<string> regionNames = from region in TShock.Regions.Regions
-														  where region.WorldID == Main.worldID.ToString()
-														  select region.Name;
-						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(regionNames),
-							new PaginationTools.Settings
-							{
-								HeaderFormat = GetString("Regions ({{0}}/{{1}}):"),
-								FooterFormat = GetString("Type {0}region list {{0}} for more.", Specifier),
-								NothingToDisplayString = GetString("There are currently no regions defined.")
-							});
+						var regionNames = TShock.Regions.Regions
+							.Where(region => region.WorldID == Main.worldID.ToString())
+							.Select(region => region.Name)
+							.ToArray();
+						PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(regionNames), new()
+						{
+							HeaderFormat = GetString("Regions ({{0}}/{{1}}):"),
+							FooterFormat = GetString("Type {0}region list {{0}} for more.", Specifier),
+							NothingToDisplayString = GetString("There are currently no regions defined.")
+						});
+
 						break;
 					}
 				case "info":
 					{
-						if (args.Parameters.Count == 1 || args.Parameters.Count > 4)
+						if (args.Parameters.Count is 1 or > 4)
 						{
 							args.Player.SendErrorMessage(GetString("Invalid syntax. Proper syntax: {0}region info <region> [-d] [page].", Specifier));
 							break;
@@ -4969,7 +4960,7 @@ namespace TShockAPI
 
 						if (region.AllowedIDs.Count > 0)
 						{
-							IEnumerable<string> sharedUsersSelector = region.AllowedIDs.Select(userId =>
+							var sharedUsersSelector = region.AllowedIDs.Select(userId =>
 							{
 								UserAccount account = TShock.UserAccounts.GetUserAccountByID(userId);
 								if (account != null)
@@ -4977,7 +4968,8 @@ namespace TShockAPI
 
 								return string.Concat("{ID: ", userId, "}");
 							});
-							List<string> extraLines = PaginationTools.BuildLinesFromTerms(sharedUsersSelector.Distinct());
+
+							List<string> extraLines = PaginationTools.BuildLinesFromTerms(sharedUsersSelector.Distinct().ToArray());
 							extraLines[0] = GetString("Shared with: ") + extraLines[0];
 							lines.AddRange(extraLines);
 						}
@@ -4988,7 +4980,7 @@ namespace TShockAPI
 
 						if (region.AllowedGroups.Count > 0)
 						{
-							List<string> extraLines = PaginationTools.BuildLinesFromTerms(region.AllowedGroups.Distinct());
+							List<string> extraLines = PaginationTools.BuildLinesFromTerms(region.AllowedGroups.Distinct().ToArray());
 							extraLines[0] = GetString("Shared with groups: ") + extraLines[0];
 							lines.AddRange(extraLines);
 						}
@@ -4998,7 +4990,7 @@ namespace TShockAPI
 						}
 
 						PaginationTools.SendPage(
-							args.Player, pageNumber, lines, new PaginationTools.Settings
+							args.Player, pageNumber, lines, new()
 							{
 								HeaderFormat = GetString("Information About Region \"{0}\" ({{0}}/{{1}}):", region.Name),
 								FooterFormat = GetString("Type {0}region info {1} {{0}} for more information.", Specifier, regionName)
@@ -5177,7 +5169,7 @@ namespace TShockAPI
 							break;
 						}
 
-						string regionName = string.Join(" ", args.Parameters.Skip(1));
+						string regionName = args.Parameters.Skip(1).JoinToString(' ');
 						Region region = TShock.Regions.GetRegionByName(regionName);
 						if (region == null)
 						{
@@ -5259,31 +5251,29 @@ namespace TShockAPI
 				return;
 			}
 
-			int pageNumber;
-			if (args.Parameters.Count == 0 || int.TryParse(args.Parameters[0], out pageNumber))
+			if (args.Parameters.Count == 0 || int.TryParse(args.Parameters[0], out int pageNumber))
 			{
 				if (!PaginationTools.TryParsePageNumber(args.Parameters, 0, args.Player, out pageNumber))
 				{
 					return;
 				}
 
-				IEnumerable<string> cmdNames = from cmd in ChatCommands
+				var cmdNames = from cmd in ChatCommands
 											   where cmd.CanRun(args.Player) && (cmd.Name != "setup" || TShock.SetupToken != 0)
 											   select Specifier + cmd.Name;
 
-				PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(cmdNames),
-					new PaginationTools.Settings
-					{
-						HeaderFormat = GetString("Commands ({{0}}/{{1}}):"),
-						FooterFormat = GetString("Type {0}help {{0}} for more.", Specifier)
-					});
+				PaginationTools.SendPage(args.Player, pageNumber, PaginationTools.BuildLinesFromTerms(cmdNames.ToArray()), new()
+				{
+					HeaderFormat = GetString("Commands ({{0}}/{{1}}):"),
+					FooterFormat = GetString("Type {0}help {{0}} for more.", Specifier)
+				});
 			}
 			else
 			{
 				string commandName = args.Parameters[0].ToLower();
 				if (commandName.StartsWith(Specifier))
 				{
-					commandName = commandName.Substring(1);
+					commandName = commandName[1..];
 				}
 
 				Command command = ChatCommands.Find(c => c.Names.Contains(commandName));
@@ -5489,7 +5479,7 @@ namespace TShockAPI
 			}
 			else if (players.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			}
 			else if (players[0].HasPermission(Permissions.mute))
 			{
@@ -5544,7 +5534,7 @@ namespace TShockAPI
 			}
 			else if (players.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			}
 			else if (args.Player.mute)
 			{
@@ -5626,7 +5616,7 @@ namespace TShockAPI
 			if (players.Count == 0)
 				args.Player.SendErrorMessage(GetString($"Could not find any player named \"{args.Parameters[0]}\""));
 			else if (players.Count > 1)
-				args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			else
 			{
 				var ply = players[0];
@@ -5651,7 +5641,7 @@ namespace TShockAPI
 			if (players.Count == 0)
 				args.Player.SendErrorMessage(GetString($"Could not find any player named \"{args.Parameters[0]}\""));
 			else if (players.Count > 1)
-				args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+				args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			else
 			{
 				var target = players[0];
@@ -5707,7 +5697,7 @@ namespace TShockAPI
 			if (players.Count == 0)
 				user.SendErrorMessage(GetString($"Could not find any player named \"{args.Parameters[0]}\""));
 			else if (players.Count > 1)
-				user.SendMultipleMatchError(players.Select(p => p.Name));
+				user.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			else
 			{
 				int type = ProjectileID.RocketFireworkRed;
@@ -5781,7 +5771,7 @@ namespace TShockAPI
 
 			string commandName;
 			if (givenCommandName[0] == Specifier[0])
-				commandName = givenCommandName.Substring(1);
+				commandName = givenCommandName[1..];
 			else
 				commandName = givenCommandName;
 
@@ -5790,7 +5780,7 @@ namespace TShockAPI
 			{
 				if (matchingCommand.Names.Count > 1)
 					args.Player.SendInfoMessage(
-						GetString("Aliases of {0}{1}: {0}{2}", Specifier, matchingCommand.Name, string.Join($", {Specifier}", matchingCommand.Names.Skip(1))));
+						GetString("Aliases of {0}{1}: {0}{2}", Specifier, matchingCommand.Name, matchingCommand.Names.Skip(1).JoinToString($", {Specifier}")));
 				else
 					args.Player.SendInfoMessage(GetString("{0}{1} defines no aliases.", Specifier, matchingCommand.Name));
 
@@ -5944,7 +5934,7 @@ namespace TShockAPI
 			if (players.Count == 0)
 				user.SendErrorMessage(GetString($"Could not find any player named \"{targetName}\"."));
 			else if (players.Count > 1)
-				user.SendMultipleMatchError(players.Select(p => p.Name));
+				user.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			else
 			{
 				var target = players[0];
@@ -5991,7 +5981,7 @@ namespace TShockAPI
 				}
 				if (players.Count > 1)
 				{
-					args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+					args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 					return;
 				}
 				playerToRespawn = players[0];
@@ -6046,7 +6036,7 @@ namespace TShockAPI
 
 				if (npcs.Count > 1)
 				{
-					user.SendMultipleMatchError(npcs.Select(n => $"{n.FullName}({n.type})"));
+					user.SendMultipleMatchError([..npcs.Select(n => $"{n.FullName}({n.type})")]);
 					return;
 				}
 				npcId = npcs[0].netID;
@@ -6091,7 +6081,7 @@ namespace TShockAPI
 			if (amountParamIndex == -1)
 				itemNameOrId = string.Join(" ", args.Parameters);
 			else
-				itemNameOrId = string.Join(" ", args.Parameters.Take(amountParamIndex));
+				itemNameOrId = args.Parameters.Take(amountParamIndex).JoinToString(' ');
 
 			Item item;
 			List<Item> matchedItems = TShock.Utils.GetItemByIdOrName(itemNameOrId);
@@ -6102,7 +6092,7 @@ namespace TShockAPI
 			}
 			else if (matchedItems.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(matchedItems.Select(i => $"{i.Name}({i.netID})"));
+				args.Player.SendMultipleMatchError([..matchedItems.Select(i => $"{i.Name}({i.netID})")]);
 				return;
 			}
 			else
@@ -6132,7 +6122,7 @@ namespace TShockAPI
 
 				if (prefixIds.Count > 1)
 				{
-					args.Player.SendMultipleMatchError(prefixIds.Select(p => p.ToString()));
+					args.Player.SendMultipleMatchError([..prefixIds.Select(p => p.ToString())]);
 					return;
 				}
 				else if (prefixIds.Count == 0)
@@ -6146,7 +6136,7 @@ namespace TShockAPI
 				}
 			}
 
-			if (args.Player.InventorySlotAvailable || (item.type > 70 && item.type < 75) || item.ammo > 0 || item.type == 58 || item.type == 184)
+			if (args.Player.InventorySlotAvailable || item.type is (> 70 and < 75) or 58 or 184 || item.ammo > 0)
 			{
 				if (itemAmount == 0 || itemAmount > item.maxStack)
 					itemAmount = item.maxStack;
@@ -6185,7 +6175,7 @@ namespace TShockAPI
 				}
 				else if (npcs.Count > 1)
 				{
-					args.Player.SendMultipleMatchError(npcs.Select(n => $"{n.FullName}({n.type})"));
+					args.Player.SendMultipleMatchError([..npcs.Select(n => $"{n.FullName}({n.type})")]);
 					return;
 				}
 				else if (args.Parameters[1].Length > 200)
@@ -6250,7 +6240,7 @@ namespace TShockAPI
 			}
 			else if (items.Count > 1)
 			{
-				args.Player.SendMultipleMatchError(items.Select(i => $"{i.Name}({i.netID})"));
+				args.Player.SendMultipleMatchError([..items.Select(i => $"{i.Name}({i.netID})")]);
 			}
 			else
 			{
@@ -6281,12 +6271,12 @@ namespace TShockAPI
 					}
 					else if (players.Count > 1)
 					{
-						args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+						args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 					}
 					else
 					{
 						var plr = players[0];
-						if (plr.InventorySlotAvailable || (item.type > 70 && item.type < 75) || item.ammo > 0 || item.type == 58 || item.type == 184)
+						if (plr.InventorySlotAvailable || item.type is (> 70 and < 75) or 58 or 184 || item.ammo > 0)
 						{
 							if (itemAmount == 0 || itemAmount > item.maxStack)
 								itemAmount = item.maxStack;
@@ -6339,7 +6329,7 @@ namespace TShockAPI
 			if (players.Count == 0)
 				user.SendErrorMessage(GetString($"Unable to find any players named \"{targetName}\""));
 			else if (players.Count > 1)
-				user.SendMultipleMatchError(players.Select(p => p.Name));
+				user.SendMultipleMatchError([..players.Select(p => p.Name)]);
 			else
 			{
 				var target = players[0];
@@ -6405,7 +6395,7 @@ namespace TShockAPI
 
 				if (found.Count > 1)
 				{
-					user.SendMultipleMatchError(found.Select(f => Lang.GetBuffName(f)));
+					user.SendMultipleMatchError([..found.Select(Lang.GetBuffName)]);
 					return;
 				}
 				id = found[0];
@@ -6448,7 +6438,7 @@ namespace TShockAPI
 			}
 			else if (foundplr.Count > 1)
 			{
-				user.SendMultipleMatchError(foundplr.Select(p => p.Name));
+				user.SendMultipleMatchError([..foundplr.Select(p => p.Name)]);
 				return;
 			}
 			else
@@ -6461,11 +6451,13 @@ namespace TShockAPI
 						user.SendErrorMessage(GetString($"Unable to find any buff named \"{args.Parameters[1]}\""));
 						return;
 					}
-					else if (found.Count > 1)
+
+					if (found.Count > 1)
 					{
-						user.SendMultipleMatchError(found.Select(b => Lang.GetBuffName(b)));
+						user.SendMultipleMatchError([..found.Select(Lang.GetBuffName)]);
 						return;
 					}
+
 					id = found[0];
 				}
 				if (args.Parameters.Count == 3)
@@ -6728,7 +6720,7 @@ namespace TShockAPI
 					args.Player.SendErrorMessage(GetString("You do not have permission to god mode another player."));
 					return;
 				}
-				string plStr = String.Join(" ", args.Parameters);
+				string plStr = args.Parameters.JoinToString(' ');
 				var players = TSPlayer.FindByNameOrID(plStr);
 				if (players.Count == 0)
 				{
@@ -6737,7 +6729,7 @@ namespace TShockAPI
 				}
 				else if (players.Count > 1)
 				{
-					args.Player.SendMultipleMatchError(players.Select(p => p.Name));
+					args.Player.SendMultipleMatchError([..players.Select(p => p.Name)]);
 					return;
 				}
 				else

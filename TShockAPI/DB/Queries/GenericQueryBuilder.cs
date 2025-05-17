@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using MySql.Data.MySqlClient;
 using TShockAPI.Extensions;
+using ZLinq;
 
 namespace TShockAPI.DB.Queries;
 
@@ -55,7 +55,7 @@ public abstract class GenericQueryBuilder : IQueryBuilder
 		var create = CreateTable(to);
 		// combine all columns in the 'from' variable excluding ones that aren't in the 'to' variable.
 		// exclude the ones that aren't in 'to' variable because if the column is deleted, why try to import the data?
-		var columns = string.Join(", ", from.Columns.Where(c => to.Columns.Any(c2 => c2.Name == c.Name)).Select(c => $"`{c.Name}`"));
+		var columns = string.Join(", ", [..from.Columns.Where(c => to.Columns.Any(c2 => c2.Name == c.Name)).Select(c => $"`{c.Name}`")]);
 		var insert = "INSERT INTO {0} ({1}) SELECT {1} FROM {2}".SFormat(escapedTable, columns, tmpTable);
 		var drop = "DROP TABLE {0}".SFormat(tmpTable);
 		return "{0}; {1}; {2}; {3};".SFormat(alter, create, insert, drop);
@@ -93,7 +93,7 @@ public abstract class GenericQueryBuilder : IQueryBuilder
 		if (0 == values.Count)
 			throw new ArgumentException(GetString("No values supplied"));
 
-		return "UPDATE {0} SET {1} {2}".SFormat(EscapeTableName(table), string.Join(", ", values.Select(v => v.Name + " = " + v.Value)), BuildWhere(wheres));
+		return "UPDATE {0} SET {1} {2}".SFormat(EscapeTableName(table), string.Join(", ", values.Select(v => $"{v.Name} = {v.Value}").ToArray()), BuildWhere(wheres));
 	}
 
 
@@ -132,5 +132,5 @@ public abstract class GenericQueryBuilder : IQueryBuilder
 	/// <returns></returns>
 	protected static string BuildWhere(List<SqlValue> wheres) => wheres.Count > 0
 		? string.Empty
-		: "WHERE {0}".SFormat(string.Join(", ", wheres.Select(v => $"{v.Name} = {v.Value}")));
+		: "WHERE {0}".SFormat(wheres.Select(v => $"{v.Name} = {v.Value}").JoinToString(", "));
 }

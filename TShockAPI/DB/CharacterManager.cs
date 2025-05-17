@@ -1,4 +1,4 @@
-/*
+﻿/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -152,7 +152,7 @@ namespace TShockAPI.DB
 			if (items.Count < NetItem.MaxInventory)
 				items.AddRange(new NetItem[NetItem.MaxInventory - items.Count]);
 
-			string initialItems = string.Join("~", items.Take(NetItem.MaxInventory));
+			string initialItems = string.Join('~', [..items.Take(NetItem.MaxInventory)]);
 			try
 			{
 				database.Query("INSERT INTO tsCharacter (Account, Health, MaxHealth, Mana, MaxMana, Inventory, spawnX, spawnY, questsCompleted) VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8);",

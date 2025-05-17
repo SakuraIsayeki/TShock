@@ -30,6 +30,7 @@ using Terraria;
 using TShockAPI.DB;
 using Newtonsoft.Json;
 using ZLinq;
+using ZLinq.Linq;
 
 namespace TShockAPI
 {
@@ -464,23 +465,31 @@ namespace TShockAPI
 		[Route("/v2/users/activelist")]
 		[Permission(RestPermissions.restviewusers)]
 		[Token]
-		private object UserActiveListV2(RestRequestArgs args)
+		private object UserActiveListV2(RestRequestArgs args) => new RestObject
 		{
-			return new RestObject() { { "activeusers", string.Join("\t", TShock.Players.Where(p => null != p && null != p.Account && p.Active).Select(p => p.Account.Name)) } };
-		}
+			{
+				"activeusers", TShock.Players
+					.Where(p => p != null && p.Account != null && p.Active)
+					.Select(p => p.Account.Name)
+					.JoinToString('\t')
+			}
+		};
 
 		[Description("Lists all user accounts in the TShock database.")]
 		[Route("/v2/users/list")]
 		[Permission(RestPermissions.restviewusers)]
 		[Token]
-		private object UserListV2(RestRequestArgs args)
+		private object UserListV2(RestRequestArgs args) => new RestObject()
 		{
-			return new RestObject() { { "users", TShock.UserAccounts.GetUserAccounts().Select(p => new Dictionary<string,object>(){
-				{"name", p.Name},
-				{"id", p.ID},
-				{"group", p.Group},
-			}) } };
-		}
+			{
+				"users", TShock.UserAccounts.GetUserAccounts().Select(p => new Dictionary<string, object>()
+				{
+					{ "name", p.Name },
+					{ "id", p.ID },
+					{ "group", p.Group },
+				}).ToArray()
+			}
+		};
 
 		[Description("Create a new TShock user account.")]
 		[Route("/v2/users/create")]
@@ -740,10 +749,8 @@ namespace TShockAPI
 		[Token]
 		private object BanListV3(RestRequestArgs args)
 		{
-			IEnumerable<Ban> bans = TShock.Bans.Bans.Select(kvp => kvp.Value);
-
 			var banList = new ArrayList();
-			foreach (var ban in bans)
+			foreach (var ban in TShock.Bans.Bans.Select(kvp => kvp.Value))
 			{
 				banList.Add(
 					new Dictionary<string, object>
@@ -947,7 +954,7 @@ namespace TShockAPI
 		private object PlayerList(RestRequestArgs args)
 		{
 			var activeplayers = TShock.Players.Where(p => null != p && p.Active).Select(p => p.Name);
-			return new RestObject() { { "players", string.Join(", ", activeplayers) } };
+			return new RestObject() { { "players", activeplayers.JoinToString(", ") } };
 		}
 
 		[Description("Fetches detailed user information on all connected users, and can be filtered by specifying a key value pair filter users where the key is a field and the value is a users field value.")]
@@ -988,11 +995,11 @@ namespace TShockAPI
 				{"group", player.Group.Name},
 				{"registered", player.Account?.Registered},
 				{"muted", player.mute },
-				{"position", player.TileX + "," + player.TileY},
-				{"inventory", string.Join(", ", inventory.Select(p => (p.Name + ":" + p.stack)))},
-				{"armor", string.Join(", ", equipment.Select(p => (p.netID + ":" + p.prefix)))},
-				{"dyes", string.Join(", ", dyes.Select(p => (p.Name)))},
-				{"buffs", string.Join(", ", player.TPlayer.buffType)}
+				{"position", $"{player.TileX},{player.TileY}" },
+				{"inventory", inventory.Select(p => $"{p.Name}:{p.stack}").JoinToString(", ")},
+				{"armor", equipment.Select(p => $"{p.netID}:{p.prefix}").JoinToString(", ")},
+				{"dyes", dyes.Select(p => p.Name).JoinToString(", ")},
+				{"buffs", player.TPlayer.buffType.JoinToString(", ")}
 			};
 		}
 
@@ -1013,12 +1020,12 @@ namespace TShockAPI
 
 			object items = new
 			{
-				inventory = player.TPlayer.inventory.Where(i => i.active).Select(item => (NetItem)item),
-				equipment = player.TPlayer.armor.Where(i => i.active).Select(item => (NetItem)item),
-				dyes = player.TPlayer.dye.Where(i => i.active).Select(item => (NetItem)item),
-				piggy = player.TPlayer.bank.item.Where(i => i.active).Select(item => (NetItem)item),
-				safe = player.TPlayer.bank2.item.Where(i => i.active).Select(item => (NetItem)item),
-				forge = player.TPlayer.bank3.item.Where(i => i.active).Select(item => (NetItem)item)
+				inventory = player.TPlayer.inventory.Where(i => i.active).Select(item => (NetItem)item).ToArray(),
+				equipment = player.TPlayer.armor.Where(i => i.active).Select(item => (NetItem)item).ToArray(),
+				dyes = player.TPlayer.dye.Where(i => i.active).Select(item => (NetItem)item).ToArray(),
+				piggy = player.TPlayer.bank.item.Where(i => i.active).Select(item => (NetItem)item).ToArray(),
+				safe = player.TPlayer.bank2.item.Where(i => i.active).Select(item => (NetItem)item).ToArray(),
+				forge = player.TPlayer.bank3.item.Where(i => i.active).Select(item => (NetItem)item).ToArray()
 			};
 
 			return new RestObject
@@ -1219,7 +1226,7 @@ namespace TShockAPI
 					var permission = method.GetCustomAttributes(false).Where(o => o is Permission);
 					if (permission.Count() > 0)
 					{
-						sb.AppendLine(GetString("* **Permissions**: `{0}`", String.Join(", ", permission.Select(p => ((Permission)p).Name))));
+						sb.AppendLine(GetString("* **Permissions**: `{0}`", permission.Select(p => ((Permission)p).Name).JoinToString(", ")));
 					}
 					else
 					{
@@ -1240,7 +1247,7 @@ namespace TShockAPI
 					}
 					sb.AppendLine();
 					var nouns = method.GetCustomAttributes(false).Where(o => o is Noun);
-					if (nouns.Count() > 0)
+					if (nouns.Any())
 					{
 						sb.AppendLine(GetString("**Nouns**:"));
 						foreach (Noun noun in nouns)
@@ -1253,7 +1260,7 @@ namespace TShockAPI
 					}
 					sb.AppendLine();
 					sb.AppendLine(GetString("**Example Usage**: `{0}?{1}`", routeattr.Route,
-						string.Join("&", nouns.Select(n => String.Format("{0}={0}", ((Noun)n).Name)))));
+						nouns.Select(n => $"{((Noun)n).Name}={((Noun)n).Name}").JoinToString('&')));
 					sb.AppendLine();
 				}
 			}

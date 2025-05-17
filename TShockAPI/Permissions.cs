@@ -1,4 +1,4 @@
-/*
+﻿/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -538,12 +538,12 @@ namespace TShockAPI
 				var desc = descattr != null && !string.IsNullOrWhiteSpace(descattr.Description) ? descattr.Description : GetString("No description available.");
 
 				var strs = GetCommands(name).Select(c => c.Names.Count > 1
-					? $"/{c.Name} (/{string.Join(" /", c.Names.Skip(1))})"
+					? $"/{c.Name} (/{c.Names.Skip(1).JoinToString(" /")})"
 					: $"/{c.Name}");
 
 				sb.AppendLine($"## {name}");
 				sb.AppendLine($"{desc}");
-				sb.AppendLine(GetString("* **Commands**: `{0}`", strs.Count() > 0 ? string.Join(", ", strs) : GetString("No associated commands.")));
+				sb.AppendLine(GetString("* **Commands**: `{0}`", strs.Any() ? strs.JoinToString(", ") : GetString("No associated commands.")));
 				sb.AppendLine();
 			}
 

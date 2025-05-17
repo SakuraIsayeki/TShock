@@ -1,4 +1,4 @@
-/*
+﻿/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -105,7 +105,7 @@ namespace TShockAPI
 
 			CreateIfNot(RulesPath, "Respect the admins!\nDon't use TNT!");
 			CreateIfNot(MotdPath, MotdFormat);
-						
+
 			CreateIfNot(WhitelistPath);
 			bool writeConfig = true; // Default to true if the file doesn't exist
 			if (File.Exists(ConfigPath))
@@ -220,15 +220,17 @@ namespace TShockAPI
 		{
 			JObject cfg = AttemptConfigUpgrade(jObject, out bool requiredUpgrade);
 
-			var configFields = new HashSet<string>(typeof(TSettings).GetFields()
+			var configFields = typeof(TSettings).GetFields()
 				.Where(field => !field.IsStatic)
-				.Select(field => field.Name));
+				.Select(field => field.Name)
+				.ToHashSet();
 
-			var jsonFields = new HashSet<string>(cfg.SelectToken("Settings")
+			var jsonFields = cfg.SelectToken("Settings")
 				.Children()
 				.Select(field => field as JProperty)
 				.Where(field => field != null)
-				.Select(field => field.Name));
+				.Select(field => field.Name)
+				.ToHashSet();
 
 			bool missingFields = !configFields.SetEquals(jsonFields);
 

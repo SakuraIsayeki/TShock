@@ -1,4 +1,4 @@
-/*
+﻿/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -31,9 +31,9 @@ namespace TShockAPI.Modules
 		/// Discovers <see cref="Module"/> derived classes from across the assembly
 		/// </summary>
 		/// <returns>Type definitions of the modules that can be created</returns>
-		IEnumerable<Type> CollectModules() => Assembly.GetExecutingAssembly()
+		IEnumerable<Type> CollectModules() => [..Assembly.GetExecutingAssembly()
 				.GetTypes()
-				.Where(t => typeof(Module).IsAssignableFrom(t) && !t.IsAbstract)
+				.Where(t => typeof(Module).IsAssignableFrom(t) && !t.IsAbstract)]
 		;
 
 		/// <summary>

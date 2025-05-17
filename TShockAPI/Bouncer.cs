@@ -1762,15 +1762,12 @@ namespace TShockAPI
 			bool wasThereABombNearby = false;
 			lock (args.Player.RecentlyCreatedProjectiles)
 			{
-				IEnumerable<int> projectileTypesThatPerformThisOperation;
-				if (amount > 0) //handle the projectiles that create fluid.
-				{
-					projectileTypesThatPerformThisOperation = projectileCreatesLiquid.Where(k => k.Value == type).Select(k => k.Key);
-				}
-				else //handle the scenario where we are removing liquid
-				{
-					projectileTypesThatPerformThisOperation = projectileCreatesLiquid.Where(k => k.Value == LiquidType.Removal).Select(k => k.Key);
-				}
+				var projectileTypesThatPerformThisOperation = (amount > 0
+						//handle the projectiles that create fluid.
+						? projectileCreatesLiquid.Where(k => k.Value == type).Select(k => k.Key)
+						//handle the scenario where we are removing liquid
+						: projectileCreatesLiquid.Where(k => k.Value == LiquidType.Removal).Select(k => k.Key)
+				).ToArray();
 
 				var recentBombs = args.Player.RecentlyCreatedProjectiles.Where(p => projectileTypesThatPerformThisOperation.Contains(Main.projectile[p.Index].type));
 				wasThereABombNearby = recentBombs.Any(r => Math.Abs(args.TileX - (Main.projectile[r.Index].position.X / 16.0f)) < TShock.Config.Settings.BombExplosionRadius
@@ -2506,7 +2503,7 @@ namespace TShockAPI
 				Main.item[num].playerIndexTheItemIsReservedFor = args.Player.Index;
 				NetMessage.SendData((int)PacketTypes.ItemDrop, args.Player.Index, -1, NetworkText.Empty, num, 1f);
 				NetMessage.SendData((int)PacketTypes.ItemOwner, args.Player.Index, -1, NetworkText.Empty, num);
-				
+
 				TShock.Log.ConsoleDebug(GetString("Bouncer / OnPlaceItemFrame rejected permissions from {0}", args.Player.Name));
 				NetMessage.SendData((int)PacketTypes.UpdateTileEntity, -1, -1, NetworkText.Empty, args.ItemFrame.ID, 0, 1);
 				args.Handled = true;

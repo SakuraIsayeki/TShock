@@ -300,7 +300,7 @@ namespace TShockAPI.DB
 		/// <param name="x">X coordinate</param>
 		/// <param name="y">Y coordinate</param>
 		/// <returns>The names of any regions that exist at the given (x, y) coordinate</returns>
-		public IEnumerable<string> InAreaRegionName(int x, int y) => Regions.Where(r => r.InArea(x, y)).Select(r => r.Name);
+		public IEnumerable<string> InAreaRegionName(int x, int y) => Regions.Where(r => r.InArea(x, y)).Select(r => r.Name).ToArray();
 
 		/// <summary>
 		/// Checks if any regions exist at the given (x, y) coordinate
@@ -309,7 +309,7 @@ namespace TShockAPI.DB
 		/// <param name="x">X coordinate</param>
 		/// <param name="y">Y coordinate</param>
 		/// <returns>The IDs of any regions that exist at the given (x, y) coordinate</returns>
-		public IEnumerable<int> InAreaRegionID(int x, int y) => Regions.Where(r => r.InArea(x, y)).Select(r => r.ID);
+		public IEnumerable<int> InAreaRegionID(int x, int y) => Regions.Where(r => r.InArea(x, y)).Select(r => r.ID).ToArray();
 
 		/// <summary>
 		/// Checks if any regions exist at the given (x, y) coordinate
@@ -318,7 +318,7 @@ namespace TShockAPI.DB
 		/// <param name="x">X coordinate</param>
 		/// <param name="y">Y coordinate</param>
 		/// <returns>The <see cref="Region"/> objects of any regions that exist at the given (x, y) coordinate</returns>
-		public IEnumerable<Region> InAreaRegion(int x, int y) => Regions.Where(r => r.InArea(x, y));
+		public IEnumerable<Region> InAreaRegion(int x, int y) => [..Regions.Where(r => r.InArea(x, y))];
 
 		/// <summary>
 		/// Changes the size of a given region

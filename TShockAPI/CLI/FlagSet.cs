@@ -26,9 +26,9 @@ namespace TShockAPI.CLI
 	/// <summary>
 	/// Describes a set of flags that are responsible for one CL argument
 	/// </summary>
-	public ref struct FlagSet : IEquatable<FlagSet>
+	public class FlagSet : IEquatable<FlagSet>, IDisposable
 	{
-		private readonly ValueEnumerable<Select<FromEnumerable<string>, string, string>, string> _flags;
+		private PooledArray<string> _flags;
 
 		internal object callback;
 		internal Action continuation;
@@ -45,7 +45,7 @@ namespace TShockAPI.CLI
 		public FlagSet(params IEnumerable<string> flags)
 		{
 			ArgumentNullException.ThrowIfNull(flags);
-			_flags = flags.Select(f => f.ToLowerInvariant());
+			_flags = flags.Select(f => f.ToLowerInvariant()).ToArrayPool();
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace TShockAPI.CLI
 		/// </summary>
 		/// <param name="flags">Flags represented by this FlagSet</param>
 		/// <param name="noArgs">Whether or not the flags specified will be followed by an argument</param>
-		public FlagSet(string[] flags, bool noArgs) : this(flags)
+		public FlagSet(IEnumerable<string> flags, bool noArgs) : this(flags)
 		{
 			NoArgs = noArgs;
 		}
@@ -63,9 +63,16 @@ namespace TShockAPI.CLI
 		/// </summary>
 		/// <param name="flag"></param>
 		/// <returns></returns>
-		public bool Contains(string flag) => _flags.Contains(flag);
+		public bool Contains(string flag) => _flags.Span.Contains(flag);
 
 		/// <inheritdoc />
-		public bool Equals(FlagSet other) => other._flags.SequenceEqual(_flags);
+		public bool Equals(FlagSet other) => other != null && other._flags.Span.SequenceEqual(_flags.Span);
+
+		/// <inheritdoc />
+		public void Dispose()
+		{
+			_flags.Dispose();
+			GC.SuppressFinalize(this);
+		}
 	}
 }

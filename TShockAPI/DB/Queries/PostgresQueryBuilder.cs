@@ -1,4 +1,4 @@
-﻿/*
+/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2025 Pryaxis & TShock Contributors
 
@@ -17,9 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using MySql.Data.MySqlClient;
+using ZLinq;
 
 namespace TShockAPI.DB.Queries;
 
@@ -43,7 +42,7 @@ public class PostgresQueryBuilder : GenericQueryBuilder
 		MySqlDbType.Int64 => "BIGINT",
 		MySqlDbType.DateTime => "TIMESTAMP",
 
-		_ => throw new NotImplementedException(Enum.GetName(typeof(MySqlDbType), type))
+		_ => throw new NotImplementedException(Enum.GetName(type))
 	};
 
 	/// <inheritdoc />
@@ -54,7 +53,7 @@ public class PostgresQueryBuilder : GenericQueryBuilder
 	{
 		ValidateSqlColumnType(table.Columns);
 
-		IEnumerable<string> columns = table.Columns.Select(c =>
+		var columns = table.Columns.Select(c =>
 		{
 			// Handle PostgreSQL-specific auto-increment using SERIAL/BIGSERIAL
 			string dataType;
@@ -75,11 +74,10 @@ public class PostgresQueryBuilder : GenericQueryBuilder
 				c.DefaultCurrentTimestamp ? "DEFAULT CURRENT_TIMESTAMP" : "");
 		});
 
-		string[] uniques = table.Columns
-			.Where(c => c.Unique).Select(c => c.Name)
-			.ToArray(); // No re-enumeration
+		var uniques = table.Columns
+			.Where(c => c.Unique).Select(c => c.Name);
 
-		return $"CREATE TABLE {EscapeTableName(table.Name)} ({string.Join(", ", columns)} {(uniques.Any() ? ", UNIQUE({0})".SFormat(string.Join(", ", uniques)) : "")})";
+		return $"CREATE TABLE {EscapeTableName(table.Name)} ({columns.JoinToString(", ")} {(uniques.Any() ? ", UNIQUE({0})".SFormat(uniques.JoinToString(", ")) : "")})";
 	}
 
 	/// <inheritdoc />

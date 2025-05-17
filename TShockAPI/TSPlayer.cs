@@ -35,6 +35,9 @@ using TShockAPI.Net;
 using Timer = System.Timers.Timer;
 using System.Linq;
 using Terraria.GameContent.Creative;
+using ZLinq;
+using ZLinq.Linq;
+
 namespace TShockAPI
 {
 	/// <summary>
@@ -1434,7 +1437,7 @@ namespace TShockAPI
 		}
 
 		/// <summary>
-		/// Teleports the player to their spawnpoint. 
+		/// Teleports the player to their spawnpoint.
 		/// Teleports to main spawnpoint if their bed is not active.
 		/// Supports SSC.
 		/// </summary>
@@ -1443,7 +1446,7 @@ namespace TShockAPI
 			// NOTE: it is vanilla behaviour to not permanently override the spawnpoint if the bed spawn is broken/invalid
 			int x = TPlayer.SpawnX;
 			int y = TPlayer.SpawnY;
-			if ((x == -1 && y == -1) || 
+			if ((x == -1 && y == -1) ||
 				!Main.tile[x, y - 1].active() || Main.tile[x, y - 1].type != TileID.Beds || !WorldGen.StartRoomCheck(x, y - 1))
 			{
 				x = Main.spawnTileX;
@@ -1590,7 +1593,7 @@ namespace TShockAPI
 					{
 						Client.TileSections[i, j] = isLoaded;
 					}
-				}	
+				}
 			}
 			else
 			{
@@ -2117,7 +2120,7 @@ namespace TShockAPI
 		{
 			SendErrorMessage(GetString("More than one match found -- unable to decide which is correct: "));
 
-			var lines = PaginationTools.BuildLinesFromTerms(matches.ToArray());
+			var lines = PaginationTools.BuildLinesFromTerms(matches);
 			lines.ForEach(SendInfoMessage);
 
 			SendErrorMessage(GetString("Use \"my query\" for items with spaces."));
