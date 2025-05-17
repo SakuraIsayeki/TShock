@@ -1,4 +1,4 @@
-﻿/*
+/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -27,6 +27,7 @@ using BCrypt.Net;
 using System.Security.Cryptography;
 using TShockAPI.DB.Queries;
 using TShockAPI.Hooks;
+using ZLinq;
 
 namespace TShockAPI.DB
 {

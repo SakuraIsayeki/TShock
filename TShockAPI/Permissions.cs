@@ -1,4 +1,4 @@
-﻿/*
+/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -22,6 +22,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ZLinq;
 
 // Since the permission nodes have annotations that say what they are, we don't need XML comments.
 #pragma warning disable 1591

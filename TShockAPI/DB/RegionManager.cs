@@ -24,6 +24,7 @@ using MySql.Data.MySqlClient;
 using Terraria;
 using Microsoft.Xna.Framework;
 using TShockAPI.DB.Queries;
+using ZLinq;
 
 namespace TShockAPI.DB
 {

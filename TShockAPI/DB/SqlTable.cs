@@ -22,6 +22,7 @@ using System.Data;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using TShockAPI.DB.Queries;
+using ZLinq;
 
 namespace TShockAPI.DB
 {

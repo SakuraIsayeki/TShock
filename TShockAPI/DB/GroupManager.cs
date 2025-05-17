@@ -24,6 +24,7 @@ using System.Diagnostics;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using TShockAPI.DB.Queries;
+using ZLinq;
 
 namespace TShockAPI.DB
 {
@@ -432,6 +433,7 @@ namespace TShockAPI.DB
 					command.AddParameter("@1", name);
 					command.ExecuteNonQuery();
 				}
+
 				foreach (var group in groups.Where(g => g.Parent != null && g.Parent == oldGroup))
 				{
 					group.Parent = newGroup;

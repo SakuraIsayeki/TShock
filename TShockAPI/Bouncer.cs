@@ -30,6 +30,7 @@ using Terraria.Localization;
 using TShockAPI.Models.PlayerUpdate;
 using System.Threading.Tasks;
 using Terraria.GameContent.Tile_Entities;
+using ZLinq;
 
 namespace TShockAPI
 {

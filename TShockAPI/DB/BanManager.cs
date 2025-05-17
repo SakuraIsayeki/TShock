@@ -1,4 +1,4 @@
-﻿/*
+/*
 TShock, a server mod for Terraria
 Copyright (C) 2011-2019 Pryaxis & TShock Contributors
 
@@ -23,6 +23,7 @@ using System.Data;
 using MySql.Data.MySqlClient;
 using System.Collections.ObjectModel;
 using TShockAPI.DB.Queries;
+using ZLinq;
 
 namespace TShockAPI.DB
 {

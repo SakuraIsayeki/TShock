@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using ZLinq;
 
 namespace TShockAPI.Configuration
 {

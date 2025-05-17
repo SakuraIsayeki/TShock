@@ -30,6 +30,7 @@ using Terraria.Utilities;
 using Microsoft.Xna.Framework;
 using Terraria.Localization;
 using TShockAPI.Localization;
+using ZLinq;
 
 namespace TShockAPI
 {

@@ -23,6 +23,7 @@ using Terraria;
 using Terraria.Initializers;
 using Terraria.Localization;
 using Terraria.UI.Chat;
+using ZLinq;
 
 namespace TShockAPI.Localization
 {
