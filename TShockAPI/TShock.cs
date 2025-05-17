@@ -50,7 +50,9 @@ using Terraria.Achievements;
 using Terraria.Initializers;
 using Terraria.UI.Chat;
 using TShockAPI.Modules;
+using ZLinq;
 
+[assembly: ZLinqDropIn(nameof(TShockAPI), DropInGenerateTypes.Everything)]
 namespace TShockAPI
 {
 	/// <summary>

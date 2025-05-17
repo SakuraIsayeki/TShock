@@ -28,6 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System.Reflection;
 using TShockPluginManager;
+using ZLinq;
+
+[assembly: ZLinqDropIn(nameof(TShockLauncher), DropInGenerateTypes.Everything)]
 
 // On occasion, users have been seen extracting TShock into their client installation directory -- this is of course incorrect, and is known
 // to cause issues. Let's attempt to catch this before anything happens (specifically, before Terraria assemblies are resolved) and prevent
