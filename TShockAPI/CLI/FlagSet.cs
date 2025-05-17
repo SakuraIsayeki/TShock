@@ -16,18 +16,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using ZLinq;
+using ZLinq.Linq;
 
 namespace TShockAPI.CLI
 {
 	/// <summary>
 	/// Describes a set of flags that are responsible for one CL argument
 	/// </summary>
-	public class FlagSet : IEquatable<FlagSet>
+	public ref struct FlagSet : IEquatable<FlagSet>
 	{
-		private IEnumerable<string> _flags;
+		private readonly ValueEnumerable<Select<FromEnumerable<string>, string, string>, string> _flags;
 
 		internal object callback;
 		internal Action continuation;
@@ -41,13 +42,9 @@ namespace TShockAPI.CLI
 		/// Creates a new <see cref="FlagSet"/> with the given flags
 		/// </summary>
 		/// <param name="flags">Flags represented by this FlagSet</param>
-		public FlagSet(params string[] flags)
+		public FlagSet(params IEnumerable<string> flags)
 		{
-			if (flags == null)
-			{
-				throw new ArgumentNullException(nameof(flags));
-			}
-
+			ArgumentNullException.ThrowIfNull(flags);
 			_flags = flags.Select(f => f.ToLowerInvariant());
 		}
 
@@ -66,24 +63,9 @@ namespace TShockAPI.CLI
 		/// </summary>
 		/// <param name="flag"></param>
 		/// <returns></returns>
-		public bool Contains(string flag)
-		{
-			return _flags.Contains(flag);
-		}
+		public bool Contains(string flag) => _flags.Contains(flag);
 
-		/// <summary>
-		/// Determines whether or not this flag set is equatable to another
-		/// </summary>
-		/// <param name="other"></param>
-		/// <returns></returns>
-		public bool Equals(FlagSet other)
-		{
-			if (other == null)
-			{
-				return false;
-			}
-
-			return other._flags == _flags;
-		}
+		/// <inheritdoc />
+		public bool Equals(FlagSet other) => other._flags.SequenceEqual(_flags);
 	}
 }
