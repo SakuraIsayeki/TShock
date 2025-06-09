@@ -315,8 +315,8 @@ namespace TShockAPI
 			try
 			{
 				// Build database
-				DbBuilder dbBuilder = new(this, Config, SavePath);
-				DB = dbBuilder.BuildDbConnection();
+				DbContextConnectionBuilder dbContextConnectionBuilder = new(this, Config, SavePath);
+				DB = dbContextConnectionBuilder.BuildDbConnection();
 
 				if (Config.Settings.UseSqlLogs)
 					Log = new SqlLog(DB, logFilename, LogClear);

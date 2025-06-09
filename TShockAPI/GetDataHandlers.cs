@@ -2849,7 +2849,7 @@ namespace TShockAPI
 			{
 				args.Player.TPlayer.statLife = cur;
 				args.Player.TPlayer.statLifeMax = max;
-				args.Player.PlayerData.maxHealth = max;
+				args.Player.PlayerData.MaxHealth = max;
 			}
 
 			return false;
@@ -3374,7 +3374,7 @@ namespace TShockAPI
 			{
 				args.Player.TPlayer.statMana = cur;
 				args.Player.TPlayer.statManaMax = max;
-				args.Player.PlayerData.maxMana = max;
+				args.Player.PlayerData.MaxMana = max;
 			}
 			return false;
 		}
@@ -4586,18 +4586,18 @@ namespace TShockAPI
 			// - The player's equipment will contain the switched loadout's item
 
 			for (var i = 0; i < NetItem.LoadoutArmorSlots; i++)
-				Terraria.Utils.Swap(ref args.Player.PlayerData.inventory[currentLoadoutArmorSlotStartIndex + i],
-					ref args.Player.PlayerData.inventory[NetItem.ArmorIndex.Item1 + i]);
+				Terraria.Utils.Swap(ref args.Player.PlayerData.Inventory[currentLoadoutArmorSlotStartIndex + i],
+					ref args.Player.PlayerData.Inventory[NetItem.ArmorIndex.Item1 + i]);
 			for (var i = 0; i < NetItem.LoadoutDyeSlots; i++)
-				Terraria.Utils.Swap(ref args.Player.PlayerData.inventory[currentLoadoutDyeSlotStartIndex + i],
-					ref args.Player.PlayerData.inventory[NetItem.DyeIndex.Item1 + i]);
+				Terraria.Utils.Swap(ref args.Player.PlayerData.Inventory[currentLoadoutDyeSlotStartIndex + i],
+					ref args.Player.PlayerData.Inventory[NetItem.DyeIndex.Item1 + i]);
 
 			for (var i = 0; i < NetItem.LoadoutArmorSlots; i++)
-				Terraria.Utils.Swap(ref args.Player.PlayerData.inventory[switchedLoadoutArmorSlotStartIndex + i],
-					ref args.Player.PlayerData.inventory[NetItem.ArmorIndex.Item1 + i]);
+				Terraria.Utils.Swap(ref args.Player.PlayerData.Inventory[switchedLoadoutArmorSlotStartIndex + i],
+					ref args.Player.PlayerData.Inventory[NetItem.ArmorIndex.Item1 + i]);
 			for (var i = 0; i < NetItem.LoadoutDyeSlots; i++)
-				Terraria.Utils.Swap(ref args.Player.PlayerData.inventory[switchedLoadoutDyeSlotStartIndex + i],
-					ref args.Player.PlayerData.inventory[NetItem.DyeIndex.Item1 + i]);
+				Terraria.Utils.Swap(ref args.Player.PlayerData.Inventory[switchedLoadoutDyeSlotStartIndex + i],
+					ref args.Player.PlayerData.Inventory[NetItem.DyeIndex.Item1 + i]);
 
 			return false;
 		}

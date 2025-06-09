@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.Data.Sqlite;
@@ -13,19 +14,19 @@ namespace TShockAPI.DB;
 /// <summary>
 /// Provides logic to build a DB connection.
 /// </summary>
-public sealed class DbBuilder
+public sealed class DbContextConnectionBuilder
 {
 	private readonly TShock _caller;
 	private readonly TShockConfig _config;
 	private readonly string _savePath;
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="DbBuilder"/> class.
+	/// Initializes a new instance of the <see cref="DbContextConnectionBuilder"/> class.
 	/// </summary>
 	/// <param name="caller">The TShock instance calling this DbBuilder.</param>
 	/// <param name="config">The TShock configuration, supplied by <see cref="TShock.Config" /> at init.</param>
 	/// <param name="savePath">The savePath registered by TShock. See <see cref="TShock.SavePath" />.</param>
-	public DbBuilder(TShock caller, TShockConfig config, string savePath)
+	public DbContextConnectionBuilder(TShock caller, TShockConfig config, string savePath)
 	{
 		_caller = caller;
 		_config = config;
@@ -39,7 +40,7 @@ public sealed class DbBuilder
 	/// <remarks>
 	/// Default settings will result in a local sqlite database file named "tshock.db" in the current directory to be used as server DB.
 	/// </remarks>
-	public IDbConnection BuildDbConnection()
+	public DbConnection BuildDbConnection()
 	{
 		string dbType = _config.Settings.StorageType.ToLowerInvariant();
 
@@ -73,6 +74,37 @@ public sealed class DbBuilder
 		{
 			ServerApi.LogWriter.PluginWriteLine(_caller, e.ToString(), TraceLevel.Error);
 			throw new("Sqlite not setup correctly", e);
+		}
+	}
+
+	internal MySqlConnector.MySqlConnection BuildPomeloMySqlConnection()
+	{
+		try
+		{
+			// If specified, use the connection string instead of other parameters.
+			if (_config.Settings.MySqlConnectionString is not (null or ""))
+			{
+				MySqlConnector.MySqlConnectionStringBuilder builder = new(_config.Settings.MySqlConnectionString);
+				return new(builder.ToString());
+			}
+
+			string[] hostport = _config.Settings.MySqlHost.Split(':');
+
+			MySqlConnector.MySqlConnectionStringBuilder connStrBuilder = new()
+			{
+				Server = hostport[0],
+				Port = hostport.Length > 1 ? uint.Parse(hostport[1]) : 3306,
+				Database = _config.Settings.MySqlDbName,
+				UserID = _config.Settings.MySqlUsername,
+				Password = _config.Settings.MySqlPassword
+			};
+
+			return new(connStrBuilder.ToString());
+		}
+		catch (MySqlConnector.MySqlException e)
+		{
+			ServerApi.LogWriter.PluginWriteLine(_caller, e.ToString(), TraceLevel.Error);
+			throw new("MySql not setup correctly", e);
 		}
 	}
 

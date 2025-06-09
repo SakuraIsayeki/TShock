@@ -29,11 +29,11 @@ namespace TShockAPI
 {
 	public class PlayerData
 	{
-		public NetItem[] inventory = new NetItem[NetItem.MaxInventory];
-		public int health = TShock.ServerSideCharacterConfig.Settings.StartingHealth;
-		public int maxHealth = TShock.ServerSideCharacterConfig.Settings.StartingHealth;
-		public int mana = TShock.ServerSideCharacterConfig.Settings.StartingMana;
-		public int maxMana = TShock.ServerSideCharacterConfig.Settings.StartingMana;
+		public NetItem[] Inventory = new NetItem[NetItem.MaxInventory];
+		public int Health = TShock.ServerSideCharacterConfig.Settings.StartingHealth;
+		public int MaxHealth = TShock.ServerSideCharacterConfig.Settings.StartingHealth;
+		public int Mana = TShock.ServerSideCharacterConfig.Settings.StartingMana;
+		public int MaxMana = TShock.ServerSideCharacterConfig.Settings.StartingMana;
 		public bool exists;
 		public int spawnX = -1;
 		public int spawnY = -1;
@@ -77,7 +77,7 @@ namespace TShockAPI
 		public PlayerData(bool includingStarterInventory = true)
 		{
 			for (int i = 0; i < NetItem.MaxInventory; i++)
-				this.inventory[i] = new NetItem();
+				this.Inventory[i] = new NetItem();
 
 			if (includingStarterInventory)
 				for (int i = 0; i < TShock.ServerSideCharacterConfig.Settings.StartingInventory.Count; i++)
@@ -106,12 +106,12 @@ namespace TShockAPI
 		/// <param name="item"></param>
 		public void StoreSlot(int slot, NetItem item)
 		{
-			if (slot > (this.inventory.Length - 1) || slot < 0) //if the slot is out of range then dont save
+			if (slot > (this.Inventory.Length - 1) || slot < 0) //if the slot is out of range then dont save
 			{
 				return;
 			}
 
-			this.inventory[slot] = item;
+			this.Inventory[slot] = item;
 		}
 
 		/// <summary>
@@ -120,10 +120,10 @@ namespace TShockAPI
 		/// <param name="player"></param>
 		public void CopyCharacter(TSPlayer player)
 		{
-			this.health = player.TPlayer.statLife > 0 ? player.TPlayer.statLife : 1;
-			this.maxHealth = player.TPlayer.statLifeMax;
-			this.mana = player.TPlayer.statMana;
-			this.maxMana = player.TPlayer.statManaMax;
+			this.Health = player.TPlayer.statLife > 0 ? player.TPlayer.statLife : 1;
+			this.MaxHealth = player.TPlayer.statLifeMax;
+			this.Mana = player.TPlayer.statMana;
+			this.MaxMana = player.TPlayer.statManaMax;
 			this.spawnX = player.TPlayer.SpawnX;
 			this.spawnY = player.TPlayer.SpawnY;
 			extraSlot = player.TPlayer.extraAccessory ? 1 : 0;
@@ -175,90 +175,90 @@ namespace TShockAPI
 				if (i < NetItem.InventoryIndex.Item2)
 				{
 					//0-58
-					this.inventory[i] = (NetItem)inventory[i];
+					this.Inventory[i] = (NetItem)inventory[i];
 				}
 				else if (i < NetItem.ArmorIndex.Item2)
 				{
 					//59-78
 					var index = i - NetItem.ArmorIndex.Item1;
-					this.inventory[i] = (NetItem)armor[index];
+					this.Inventory[i] = (NetItem)armor[index];
 				}
 				else if (i < NetItem.DyeIndex.Item2)
 				{
 					//79-88
 					var index = i - NetItem.DyeIndex.Item1;
-					this.inventory[i] = (NetItem)dye[index];
+					this.Inventory[i] = (NetItem)dye[index];
 				}
 				else if (i < NetItem.MiscEquipIndex.Item2)
 				{
 					//89-93
 					var index = i - NetItem.MiscEquipIndex.Item1;
-					this.inventory[i] = (NetItem)miscEqups[index];
+					this.Inventory[i] = (NetItem)miscEqups[index];
 				}
 				else if (i < NetItem.MiscDyeIndex.Item2)
 				{
 					//93-98
 					var index = i - NetItem.MiscDyeIndex.Item1;
-					this.inventory[i] = (NetItem)miscDyes[index];
+					this.Inventory[i] = (NetItem)miscDyes[index];
 				}
 				else if (i < NetItem.PiggyIndex.Item2)
 				{
 					//98-138
 					var index = i - NetItem.PiggyIndex.Item1;
-					this.inventory[i] = (NetItem)piggy[index];
+					this.Inventory[i] = (NetItem)piggy[index];
 				}
 				else if (i < NetItem.SafeIndex.Item2)
 				{
 					//138-178
 					var index = i - NetItem.SafeIndex.Item1;
-					this.inventory[i] = (NetItem)safe[index];
+					this.Inventory[i] = (NetItem)safe[index];
 				}
 				else if (i < NetItem.TrashIndex.Item2)
 				{
 					//179-219
-					this.inventory[i] = (NetItem)trash;
+					this.Inventory[i] = (NetItem)trash;
 				}
 				else if (i < NetItem.ForgeIndex.Item2)
 				{
 					//220
 					var index = i - NetItem.ForgeIndex.Item1;
-					this.inventory[i] = (NetItem)forge[index];
+					this.Inventory[i] = (NetItem)forge[index];
 				}
 				else if(i < NetItem.VoidIndex.Item2)
 				{
 					//220
 					var index = i - NetItem.VoidIndex.Item1;
-					this.inventory[i] = (NetItem)voidVault[index];
+					this.Inventory[i] = (NetItem)voidVault[index];
 				}
 				else if(i < NetItem.Loadout1Armor.Item2)
 				{
 					var index = i - NetItem.Loadout1Armor.Item1;
-					this.inventory[i] = (NetItem)loadout1Armor[index];
+					this.Inventory[i] = (NetItem)loadout1Armor[index];
 				}
 				else if(i < NetItem.Loadout1Dye.Item2)
 				{
 					var index = i - NetItem.Loadout1Dye.Item1;
-					this.inventory[i] = (NetItem)loadout1Dye[index];
+					this.Inventory[i] = (NetItem)loadout1Dye[index];
 				}
 				else if(i < NetItem.Loadout2Armor.Item2)
 				{
 					var index = i - NetItem.Loadout2Armor.Item1;
-					this.inventory[i] = (NetItem)loadout2Armor[index];
+					this.Inventory[i] = (NetItem)loadout2Armor[index];
 				}
 				else if(i < NetItem.Loadout2Dye.Item2)
 				{
 					var index = i - NetItem.Loadout2Dye.Item1;
-					this.inventory[i] = (NetItem)loadout2Dye[index];
+					this.Inventory[i] = (NetItem)loadout2Dye[index];
 				}
 				else if(i < NetItem.Loadout3Armor.Item2)
 				{
 					var index = i - NetItem.Loadout3Armor.Item1;
-					this.inventory[i] = (NetItem)loadout3Armor[index];
+					this.Inventory[i] = (NetItem)loadout3Armor[index];
 				}
 				else if(i < NetItem.Loadout3Dye.Item2)
 				{
 					var index = i - NetItem.Loadout3Dye.Item1;
-					this.inventory[i] = (NetItem)loadout3Dye[index];
+					this.Inventory[i] = (NetItem)loadout3Dye[index];
 				}
 			}
 		}
@@ -272,10 +272,10 @@ namespace TShockAPI
 			// Start ignoring SSC-related packets! This is critical so that we don't send or receive dirty data!
 			player.IgnoreSSCPackets = true;
 
-			player.TPlayer.statLife = this.health;
-			player.TPlayer.statLifeMax = this.maxHealth;
-			player.TPlayer.statMana = this.maxMana;
-			player.TPlayer.statManaMax = this.maxMana;
+			player.TPlayer.statLife = this.Health;
+			player.TPlayer.statLifeMax = this.MaxHealth;
+			player.TPlayer.statMana = this.MaxMana;
+			player.TPlayer.statManaMax = this.MaxMana;
 			player.TPlayer.SpawnX = this.spawnX;
 			player.TPlayer.SpawnY = this.spawnY;
 			player.TPlayer.hairDye = this.hairDye;
@@ -325,186 +325,186 @@ namespace TShockAPI
 				if (i < NetItem.InventoryIndex.Item2)
 				{
 					//0-58
-					player.TPlayer.inventory[i].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.inventory[i].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.inventory[i].netID != 0)
 					{
-						player.TPlayer.inventory[i].stack = this.inventory[i].Stack;
-						player.TPlayer.inventory[i].prefix = this.inventory[i].PrefixId;
+						player.TPlayer.inventory[i].stack = this.Inventory[i].Stack;
+						player.TPlayer.inventory[i].prefix = this.Inventory[i].PrefixId;
 					}
 				}
 				else if (i < NetItem.ArmorIndex.Item2)
 				{
 					//59-78
 					var index = i - NetItem.ArmorIndex.Item1;
-					player.TPlayer.armor[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.armor[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.armor[index].netID != 0)
 					{
-						player.TPlayer.armor[index].stack = this.inventory[i].Stack;
-						player.TPlayer.armor[index].prefix = (byte)this.inventory[i].PrefixId;
+						player.TPlayer.armor[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.armor[index].prefix = (byte)this.Inventory[i].PrefixId;
 					}
 				}
 				else if (i < NetItem.DyeIndex.Item2)
 				{
 					//79-88
 					var index = i - NetItem.DyeIndex.Item1;
-					player.TPlayer.dye[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.dye[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.dye[index].netID != 0)
 					{
-						player.TPlayer.dye[index].stack = this.inventory[i].Stack;
-						player.TPlayer.dye[index].prefix = (byte)this.inventory[i].PrefixId;
+						player.TPlayer.dye[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.dye[index].prefix = (byte)this.Inventory[i].PrefixId;
 					}
 				}
 				else if (i < NetItem.MiscEquipIndex.Item2)
 				{
 					//89-93
 					var index = i - NetItem.MiscEquipIndex.Item1;
-					player.TPlayer.miscEquips[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.miscEquips[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.miscEquips[index].netID != 0)
 					{
-						player.TPlayer.miscEquips[index].stack = this.inventory[i].Stack;
-						player.TPlayer.miscEquips[index].prefix = (byte)this.inventory[i].PrefixId;
+						player.TPlayer.miscEquips[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.miscEquips[index].prefix = (byte)this.Inventory[i].PrefixId;
 					}
 				}
 				else if (i < NetItem.MiscDyeIndex.Item2)
 				{
 					//93-98
 					var index = i - NetItem.MiscDyeIndex.Item1;
-					player.TPlayer.miscDyes[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.miscDyes[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.miscDyes[index].netID != 0)
 					{
-						player.TPlayer.miscDyes[index].stack = this.inventory[i].Stack;
-						player.TPlayer.miscDyes[index].prefix = (byte)this.inventory[i].PrefixId;
+						player.TPlayer.miscDyes[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.miscDyes[index].prefix = (byte)this.Inventory[i].PrefixId;
 					}
 				}
 				else if (i < NetItem.PiggyIndex.Item2)
 				{
 					//98-138
 					var index = i - NetItem.PiggyIndex.Item1;
-					player.TPlayer.bank.item[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.bank.item[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.bank.item[index].netID != 0)
 					{
-						player.TPlayer.bank.item[index].stack = this.inventory[i].Stack;
-						player.TPlayer.bank.item[index].prefix = (byte)this.inventory[i].PrefixId;
+						player.TPlayer.bank.item[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.bank.item[index].prefix = (byte)this.Inventory[i].PrefixId;
 					}
 				}
 				else if (i < NetItem.SafeIndex.Item2)
 				{
 					//138-178
 					var index = i - NetItem.SafeIndex.Item1;
-					player.TPlayer.bank2.item[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.bank2.item[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.bank2.item[index].netID != 0)
 					{
-						player.TPlayer.bank2.item[index].stack = this.inventory[i].Stack;
-						player.TPlayer.bank2.item[index].prefix = (byte)this.inventory[i].PrefixId;
+						player.TPlayer.bank2.item[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.bank2.item[index].prefix = (byte)this.Inventory[i].PrefixId;
 					}
 				}
 				else if (i < NetItem.TrashIndex.Item2)
 				{
 					//179-219
 					var index = i - NetItem.TrashIndex.Item1;
-					player.TPlayer.trashItem.netDefaults(this.inventory[i].NetId);
+					player.TPlayer.trashItem.netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.trashItem.netID != 0)
 					{
-						player.TPlayer.trashItem.stack = this.inventory[i].Stack;
-						player.TPlayer.trashItem.prefix = (byte)this.inventory[i].PrefixId;
+						player.TPlayer.trashItem.stack = this.Inventory[i].Stack;
+						player.TPlayer.trashItem.prefix = (byte)this.Inventory[i].PrefixId;
 					}
 				}
 				else if (i < NetItem.ForgeIndex.Item2)
 				{
 					//220
 					var index = i - NetItem.ForgeIndex.Item1;
-					player.TPlayer.bank3.item[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.bank3.item[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.bank3.item[index].netID != 0)
 					{
-						player.TPlayer.bank3.item[index].stack = this.inventory[i].Stack;
-						player.TPlayer.bank3.item[index].Prefix((byte)this.inventory[i].PrefixId);
+						player.TPlayer.bank3.item[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.bank3.item[index].Prefix((byte)this.Inventory[i].PrefixId);
 					}
 				}
 				else if (i < NetItem.VoidIndex.Item2)
 				{
 					//260
 					var index = i - NetItem.VoidIndex.Item1;
-					player.TPlayer.bank4.item[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.bank4.item[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.bank4.item[index].netID != 0)
 					{
-						player.TPlayer.bank4.item[index].stack = this.inventory[i].Stack;
-						player.TPlayer.bank4.item[index].Prefix((byte)this.inventory[i].PrefixId);
+						player.TPlayer.bank4.item[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.bank4.item[index].Prefix((byte)this.Inventory[i].PrefixId);
 					}
 				}
 				else if (i < NetItem.Loadout1Armor.Item2)
 				{
 					var index = i - NetItem.Loadout1Armor.Item1;
-					player.TPlayer.Loadouts[0].Armor[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.Loadouts[0].Armor[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.Loadouts[0].Armor[index].netID != 0)
 					{
-						player.TPlayer.Loadouts[0].Armor[index].stack = this.inventory[i].Stack;
-						player.TPlayer.Loadouts[0].Armor[index].Prefix((byte)this.inventory[i].PrefixId);
+						player.TPlayer.Loadouts[0].Armor[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.Loadouts[0].Armor[index].Prefix((byte)this.Inventory[i].PrefixId);
 					}
 				}
 				else if (i < NetItem.Loadout1Dye.Item2)
 				{
 					var index = i - NetItem.Loadout1Dye.Item1;
-					player.TPlayer.Loadouts[0].Dye[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.Loadouts[0].Dye[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.Loadouts[0].Dye[index].netID != 0)
 					{
-						player.TPlayer.Loadouts[0].Dye[index].stack = this.inventory[i].Stack;
-						player.TPlayer.Loadouts[0].Dye[index].Prefix((byte)this.inventory[i].PrefixId);
+						player.TPlayer.Loadouts[0].Dye[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.Loadouts[0].Dye[index].Prefix((byte)this.Inventory[i].PrefixId);
 					}
 				}
 				else if (i < NetItem.Loadout2Armor.Item2)
 				{
 					var index = i - NetItem.Loadout2Armor.Item1;
-					player.TPlayer.Loadouts[1].Armor[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.Loadouts[1].Armor[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.Loadouts[1].Armor[index].netID != 0)
 					{
-						player.TPlayer.Loadouts[1].Armor[index].stack = this.inventory[i].Stack;
-						player.TPlayer.Loadouts[1].Armor[index].Prefix((byte)this.inventory[i].PrefixId);
+						player.TPlayer.Loadouts[1].Armor[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.Loadouts[1].Armor[index].Prefix((byte)this.Inventory[i].PrefixId);
 					}
 				}
 				else if (i < NetItem.Loadout2Dye.Item2)
 				{
 					var index = i - NetItem.Loadout2Dye.Item1;
-					player.TPlayer.Loadouts[1].Dye[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.Loadouts[1].Dye[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.Loadouts[1].Dye[index].netID != 0)
 					{
-						player.TPlayer.Loadouts[1].Dye[index].stack = this.inventory[i].Stack;
-						player.TPlayer.Loadouts[1].Dye[index].Prefix((byte)this.inventory[i].PrefixId);
+						player.TPlayer.Loadouts[1].Dye[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.Loadouts[1].Dye[index].Prefix((byte)this.Inventory[i].PrefixId);
 					}
 				}
 				else if (i < NetItem.Loadout3Armor.Item2)
 				{
 					var index = i - NetItem.Loadout3Armor.Item1;
-					player.TPlayer.Loadouts[2].Armor[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.Loadouts[2].Armor[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.Loadouts[2].Armor[index].netID != 0)
 					{
-						player.TPlayer.Loadouts[2].Armor[index].stack = this.inventory[i].Stack;
-						player.TPlayer.Loadouts[2].Armor[index].Prefix((byte)this.inventory[i].PrefixId);
+						player.TPlayer.Loadouts[2].Armor[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.Loadouts[2].Armor[index].Prefix((byte)this.Inventory[i].PrefixId);
 					}
 				}
 				else if (i < NetItem.Loadout3Dye.Item2)
 				{
 					var index = i - NetItem.Loadout3Dye.Item1;
-					player.TPlayer.Loadouts[2].Dye[index].netDefaults(this.inventory[i].NetId);
+					player.TPlayer.Loadouts[2].Dye[index].netDefaults(this.Inventory[i].NetId);
 
 					if (player.TPlayer.Loadouts[2].Dye[index].netID != 0)
 					{
-						player.TPlayer.Loadouts[2].Dye[index].stack = this.inventory[i].Stack;
-						player.TPlayer.Loadouts[2].Dye[index].Prefix((byte)this.inventory[i].PrefixId);
+						player.TPlayer.Loadouts[2].Dye[index].stack = this.Inventory[i].Stack;
+						player.TPlayer.Loadouts[2].Dye[index].Prefix((byte)this.Inventory[i].PrefixId);
 					}
 				}
 			}
