@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -32,8 +32,10 @@
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="MySql.Data" Version="9.1.0" />
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
-        <PackageReference Include="Npgsql" Version="9.0.3" />
-        
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.5" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0-preview.3.efcore.9.0.0" />
+
 		<PackageReference Include="ModFramework" Version="1.1.13" GeneratePathProperty="true" /> <!-- only used to extract out to ./bin. -->
 		<PackageReference Include="GetText.NET" Version="8.0.5" /> <!-- only used to extract out to ./bin. -->
 
